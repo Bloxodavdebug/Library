@@ -1,1 +1,6 @@
+Test2;Admin;Novel;magazine;1999
+Peace and war;Tolstoy Leo;Adventure;book;1989
+A;A;A;book;2025
 War and peace;Leo Tolstoy;Novel;book;0
+Test;Admin;Novel;magazine;2000
+Test3;Test;Horror;newspaper;2024

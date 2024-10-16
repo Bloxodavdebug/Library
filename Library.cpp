@@ -43,22 +43,39 @@ void deleteSource(const string& title) {
     cout << "Source '" << title << "' not found." << endl;
 }
 
-bool searchBook(const string& author, const string& title) {
+void searchBooks(const string& author, const string& title) {
+    bool found = false;
     for (int i = 0; i < count_; i++) {
-        if (sources[i].type == "book" and sources[i].author == author and sources[i].title == title) {
-            return true;
+        if (sources[i].type == "book" and
+            (author.empty() || sources[i].author == author) and
+            (title.empty() || sources[i].title == title)) {
+            cout << "Found Book: Title: " << sources[i].title
+                << ", Author: " << sources[i].author
+                << ", Category: " << sources[i].category
+                << ", Year: " << sources[i].year << endl;
+            found = true;
         }
     }
-    return false;
+    if (!found) {
+        cout << "No books found." << endl;
+    }
 }
 
-bool searchMagazine(const string& title, int year) {
+
+void searchMagazines(const string& title, int year) {
+    bool found = false;
     for (int i = 0; i < count_; i++) {
-        if (sources[i].type == "magazine" and sources[i].title == title and sources[i].year == year) {
-            return true;
+        if (sources[i].type == "magazine" and
+            (title.empty() || sources[i].title == title) and
+            (year == 0 || sources[i].year == year)) {
+            cout << "Found Magazine: Title: " << sources[i].title
+                << ", Year: " << sources[i].year << endl;
+            found = true;
         }
     }
-    return false;
+    if (!found) {
+        cout << "No magazines found." << endl;
+    }
 }
 
 void viewAllSources() {
@@ -162,6 +179,18 @@ void loadFromFile() {
     }
 }
 
+void SortSources() {
+    for (int i = 0; i < count_ - 1; i++) {
+        for (int j = 0; j < count_ - i - 1; j++) {
+            if (sources[j].type > sources[j + 1].type or (sources[j].type == sources[j + 1].type and sources[j].title > sources[j + 1].title)) {
+                swap(sources[j], sources[j + 1]);
+            }
+        }
+    }
+}
+
+
+
 
 void displayMenu() {
     cout << R"(
@@ -176,6 +205,7 @@ void displayMenu() {
     8. Select magazines by year
     9. Count books by category
     10. Search by index
+    11. Sort library
     0. Exit
     )";
     cout << "Enter your choice -->  ";
@@ -201,13 +231,13 @@ int main() {
             cout << "Enter title: ";
             cin.ignore();
             getline(cin, title);
-            cout << "Enter author (leave blank for non-books): ";
+            cout << "Enter author: ";
             getline(cin, author);
-            cout << "Enter category (for books, leave blank for non-books): ";
+            cout << "Enter category: ";
             getline(cin, category);
             cout << "Enter type (book, magazine, newspaper): ";
             getline(cin, type);
-            cout << "Enter year (for magazines and newspapers, 0 for books): ";
+            cout << "Enter year: ";
             cin >> year;
             addSource(title, author, category, type, year);
             break;
@@ -222,25 +252,23 @@ int main() {
         }
         case 4: {
             string author, title;
-            cout << "Enter author's name: ";
+            cout << "Enter author's name (or leave blank for any): ";
             cin.ignore();
             getline(cin, author);
-            cout << "Enter book title: ";
+            cout << "Enter book title (or leave blank for any): ";
             getline(cin, title);
-            bool found = searchBook(author, title);
-            cout << (found ? "Book found." : "Book not found.") << endl;
+            searchBooks(author, title);
             break;
         }
         case 5: {
             string title;
             int year;
-            cout << "Enter magazine title: ";
+            cout << "Enter magazine title (or leave blank for any): ";
             cin.ignore();
             getline(cin, title);
-            cout << "Enter year: ";
+            cout << "Enter year (0 for any): ";
             cin >> year;
-            bool found = searchMagazine(title, year);
-            cout << (found ? "Magazine found." : "Magazine not found.") << endl;
+            searchMagazines(title, year);
             break;
         }
         case 6: {
@@ -285,12 +313,19 @@ int main() {
             searchByIndex(index);
             break;
         }
+        case 11: {
+            cout << "\nAll sources in the library (sorted):\n";
+            SortSources(); 
+            viewAllSources(); 
+            break;
+        }
+
         case 0:
             cout << "Exiting the program.\n";
             saveToFile();
             break;
         default:
-            cout << "Invalid choice. Try again.\n";
+            cout << "Invalid choice \n";
         }
     } while (choice != 0);
 }
